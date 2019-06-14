@@ -1,0 +1,5 @@
+package agreementqis;
+
+public enum Category {
+	CONVERGENCE, DIVERSITY, COMBINATION, COVERAGE// , SPREAD, UNIFORMITY, CARDINALITY
+}
