@@ -16,6 +16,17 @@ library("fmsb") # for Kappa.test
 options(scipen = 2)#for scientific notation
 options(digits = 3)
 
+RECTANGULAR_PLOT = TRUE
+
+suffix = ""
+w = 7
+h = 7
+if(RECTANGULAR_PLOT) {
+  w = 10
+  h = 5
+  suffix = "_rect"
+}
+
 data <- read.table(file = "inputData/inputData.csv", head = TRUE, sep = ";")
 QIs <- c("HV", "IGD", "EP", "GD", "GS", "ED", "PFS", "C")
 ALGs <- c("CELLDE", "MOCELL", "NSGAII", "PAES", "SMPSO", "SPEA2")
@@ -126,7 +137,7 @@ for (i in 1:(length(QIs) - 1)) {
 rq1 <- rq1[order(-rq1$kTestEst),]
 write.table(rq1, file = "results/rq1.txt", sep = "\t", quote = FALSE, row.names = FALSE)
 
-pdf(file = "plots/rq1_OA_K.pdf")
+pdf(file = paste0("plots/rq1_OA_K", suffix, ".pdf"), width = w, height = h)
 par(mar = c(7, 3, 0.1, 0.1))
 plot(
   rq1$kTestEst,
@@ -146,7 +157,7 @@ points(rq1$OverallAgreement, pch = 6)
 legend(2, 1, legend = c("K-value", "Overall agreement"), pch = c(1, 6), cex = 0.8)
 dev.off()
 
-pdf(file = "plots/rq1_OA_K_pValues.pdf")
+pdf(file = paste0("plots/rq1_OA_K_pValues", suffix, ".pdf"), width = w, height = h)
 par(mar = c(7, 3, 0.1, 0.1))
 plot(
   rq1$kTestPvalue,
@@ -255,7 +266,7 @@ write.table(rq2_1_UtestA12_Prob_Kappa_table, file = "results/rq2_1_UtestA12_Prob
 #Kendall for checking whether the two measures are consistent
 Kendall(rq2$OverallAgreement, rq2$kTestEst)#tau = 0.855, 2-sided pvalue < 2e-16
 #rq2.2 - comparison of each pair of QIs
-pdf(file = "plots/rq2_2_OA_QIs.pdf")
+pdf(file = paste0("plots/rq2_2_OA_QIs", suffix, ".pdf"), width = w, height = h)
 par(cex.lab=1.2, cex.axis=1.2)
 par(mar = c(5.8, 4, 0.1, 0.1))
 boxplot(OverallAgreement ~ q1vsq2, data = rq2, las = 2, ylab = "OA across search problems",
@@ -263,7 +274,7 @@ boxplot(OverallAgreement ~ q1vsq2, data = rq2, las = 2, ylab = "OA across search
 )
 #title(main = "rq2.2 OverallAgreement~pair of QIs")
 dev.off()
-pdf(file = "plots/rq2_2_Kappa_QIs.pdf")
+pdf(file = paste0("plots/rq2_2_Kappa_QIs", suffix, ".pdf"), width = w, height = h)
 par(cex.lab=1.2, cex.axis=1.2)
 par(mar = c(5.8, 4, 0.1, 0.1))
 boxplot(kTestEst ~ q1vsq2, data = rq2, las = 2, ylab = "Kappa across search problems",
@@ -374,7 +385,7 @@ write.table(rq3_1a_aggrSigBowker, file = "results/rq3_1a_aggrSigBowker.txt", sep
 #Kendall for checking whether the two measures are consistent
 Kendall(rq3_1$OverallAgreement, rq3_1$kTestEst)#tau = 0.775, 2-sided pvalue < 2e-16
 #rq3_1b - comparison of each pair of QIs
-pdf(file = "plots/rq3_1b_OA_QIs.pdf")
+pdf(file = paste0("plots/rq3_1b_OA_QIs", suffix, ".pdf"), width = w, height = h)
 par(cex.lab=1.2, cex.axis=1.2)
 par(mar = c(5.8, 4, 0.1, 0.1))
 boxplot(OverallAgreement ~ q1vsq2, data = rq3_1, las = 2, ylab = "OA across MOSAs",
@@ -382,7 +393,7 @@ boxplot(OverallAgreement ~ q1vsq2, data = rq3_1, las = 2, ylab = "OA across MOSA
 )
 #title(main = "rq3.1b OverallAgreement~pair of QIs")
 dev.off()
-pdf(file = "plots/rq3_1b_Kappa_QIs.pdf")
+pdf(file = paste0("plots/rq3_1b_Kappa_QIs", suffix, ".pdf"), width = w, height = h)
 par(cex.lab=1.2, cex.axis=1.2)
 par(mar = c(5.8, 4, 0.1, 0.1))
 boxplot(kTestEst ~ q1vsq2, data = rq3_1, las = 2, ylab = "Kappa across MOSAs",
@@ -433,7 +444,7 @@ write.table(rq3_2, file = "results/rq3_2.txt", sep = "\t", quote = FALSE, row.na
 Kendall(rq3_2$OverallAgreement, rq3_2$kTestEst)#tau = 0.477, 2-sided pvalue < 2e-16
 
 #rq3_2 - comparison of each pair of QIs
-pdf(file = "plots/rq3_2_OA_QIs.pdf")
+pdf(file = paste0("plots/rq3_2_OA_QIs", suffix, ".pdf"), width = w, height = h)
 par(cex.lab=1.2, cex.axis=1.2)
 par(mar = c(5.8, 4, 0.1, 0.1))
 boxplot(OverallAgreement ~ q1vsq2, data = rq3_2, las = 2, ylab = "OA across pairs of MOSAs",
@@ -441,7 +452,7 @@ boxplot(OverallAgreement ~ q1vsq2, data = rq3_2, las = 2, ylab = "OA across pair
 )
 #title(main = "RQ3.2 OverallAgreement~pair of QIs (pairs of MOSAs)")
 dev.off()
-pdf(file = "plots/rq3_2_Kappa_QIs.pdf")
+pdf(file = paste0("plots/rq3_2_Kappa_QIs", suffix, ".pdf"), width = w, height = h)
 par(cex.lab=1.2, cex.axis=1.2)
 par(mar = c(5.8, 4, 0.1, 0.1))
 boxplot(kTestEst ~ q1vsq2, data = rq3_2, las = 2, ylab = "Kappa across pairs of MOSAs",
