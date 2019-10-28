@@ -1,2 +1,0 @@
-pair	tau	p-value
-OAvsK	0.835118174552917	0

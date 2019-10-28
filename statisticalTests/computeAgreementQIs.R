@@ -1,7 +1,6 @@
 setwd(".")
 rm(list = ls(all = TRUE))
 library("ggpubr") # for visualizing the distribution
-library("Kendall")#for Kendall
 library("effsize")#for A12 test https://rdrr.io/cran/effsize/man/VD.A.html
 library("fmsb") # for Kappa.test
 #k            Interpretation
@@ -177,20 +176,6 @@ points(rq1$bowkerP, pch = 8)
 legend(2, 1, legend = c("Kappa", "Bowker"), pch = c(1, 8), cex = 0.8)
 dev.off()
 
-#http://www.sthda.com/english/wiki/normality-test-in-r
-#Shapiro-Wilk normality test
-shapiro.test(rq1$OverallAgreement) #W = 1, p-value = 0.2 (normal distribution)
-shapiro.test(rq1$kTestEst) #W = 0.9, p-value = 0.002 (not normal distribution)
-#visual test of normality
-ggdensity(rq1$OverallAgreement)
-ggqqplot(rq1$OverallAgreement)
-ggdensity(rq1$kTestEst)
-ggqqplot(rq1$kTestEst)
-#The distribution if Kappa is not normal, and so we apply the non-parametric test Kendall
-rq1KendallOAvsK <- Kendall(rq1$OverallAgreement, rq1$kTestEst) #tau = 0.835, 2-sided pvalue < 2e-16
-write.table(matrix(c("pair", "tau", "p-value", "OAvsK", rq1KendallOAvsK$tau, rq1KendallOAvsK$sl), ncol = 3, byrow = TRUE),
-            file = "results/rq1Kendall.txt", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
-
 wilcox.test(rq1$OverallAgreement, rq1$kTestEst, exact = FALSE) #p-value = 0.00003
 
 #####################################
@@ -198,7 +183,6 @@ wilcox.test(rq1$OverallAgreement, rq1$kTestEst, exact = FALSE) #p-value = 0.0000
 #RQ2 (28*11=308 rows of pairs of quality indicators (28) and problems (11))
 #similar to RQ1, but the results are disaggregated by problem (11 case studies)
 rq2 <- data.frame()
-rq2_1_Kendall_Problem <- data.frame()
 for (p in Problems) {
   dataP <- subset(data, data$CaseStudy == p)
   #numExpsPerP <- NROW(dataP) #15 for all the problems, except for RM for which are 10 (CellDE is not applicable for RM)
@@ -208,32 +192,10 @@ for (p in Problems) {
       rq2 <- rbind(rq2, testsForQIiAndQIj)
     }
   }
-  rq2Problem <- subset(rq2, rq2$Problem == p)
-
-  #rq2.1
-  shapOA <- shapiro.test(rq2Problem$OverallAgreement)
-  shapK <- shapiro.test(rq2Problem$kTestEst)
-  kendallOAvsK <- Kendall(rq2Problem$OverallAgreement, rq2Problem$kTestEst)
-  rq2_1_Kendall_Problem <-
-    rbind(
-      rq2_1_Kendall_Problem,
-      data.frame(
-        Problem = p,
-        OAvsK_tau = kendallOAvsK$tau,
-        OAvsK_p = kendallOAvsK$sl,
-        shapOA_p = shapOA$p.value,
-        shapK_p = shapK$p.value
-      )
-    )
 }
 rq2 <- rq2[order(-rq2$OverallAgreement),]
 write.table(rq2, file = "results/rq2.txt", sep = "\t", quote = FALSE, row.names = FALSE)
 
-#rq2.1: Kendall's test for each problem
-rq2_1_Kendall_Problem$normalOA <- ifelse(rq2_1_Kendall_Problem$shapOA_p < 0.05, "FALSE", "TRUE")
-rq2_1_Kendall_Problem$normalK <- ifelse(rq2_1_Kendall_Problem$shapK_p < 0.05, "FALSE", "TRUE")
-rq2_1_Kendall_Problem$correlated <- ifelse(rq2_1_Kendall_Problem$OAvsK_p < 0.05, "TRUE", "FALSE")
-write.table(rq2_1_Kendall_Problem, file = "results/rq2_1_Kendall_Problem.txt", sep = "\t", quote = FALSE, row.names = TRUE)
 
 #rq2.1: Kruskal-Wallis for checking whether there exist sig. differences among QIs pairs
 kruskal.test(rq2$OverallAgreement, rq2$Problem, correct = FALSE) #p-value = 0.00009
@@ -261,10 +223,6 @@ rq2_1_UtestA12_Prob_Kappa_table <- table(rq2_1_UtestA12_Prob_Kappa[, c(1, 3)])
 write.table(rq2_1_UtestA12_Prob_OA_table, file = "results/rq2_1_UtestA12_Prob_OA_table.txt", sep = "\t", quote = FALSE, row.names = TRUE)
 write.table(rq2_1_UtestA12_Prob_Kappa_table, file = "results/rq2_1_UtestA12_Prob_Kappa_table.txt", sep = "\t", quote = FALSE, row.names = TRUE)
 
-
-#rq2.2
-#Kendall for checking whether the two measures are consistent
-Kendall(rq2$OverallAgreement, rq2$kTestEst)#tau = 0.855, 2-sided pvalue < 2e-16
 #rq2.2 - comparison of each pair of QIs
 pdf(file = paste0("plots/rq2_2_OA_QIs", suffix, ".pdf"), width = w, height = h)
 par(cex.lab=1.2, cex.axis=1.2)
@@ -307,7 +265,6 @@ write.table(rq2_2_Fisher, file = "results/rq2_2_Fisher.txt", sep = "\t", quote =
 #of comparisons of A with the other algs (5*11, i.e., other 5 algs in 11 case studies)
 #in which QI1 and QI2 agree
 rq3_1 <- data.frame()
-rq3_1a_Kendall_Alg <- data.frame()
 for (a in ALGs) {
   dataA <- subset(data, data$A == a | data$B == a)
   #numExpsPerA <- NROW(dataA)
@@ -318,34 +275,11 @@ for (a in ALGs) {
     }
   }
   rq3_1Alg <- subset(rq3_1, rq3_1$Alg == a)
-
-  #rq3.1a
-  #for checking the distribution
-  shapOA <- shapiro.test(rq3_1Alg$OverallAgreement)
-  shapK <- shapiro.test(rq3_1Alg$kTestEst)
-  kendallOAvsK <- Kendall(rq3_1Alg$OverallAgreement, rq3_1Alg$kTestEst)
-  rq3_1a_Kendall_Alg <-
-    rbind(
-      rq3_1a_Kendall_Alg,
-      data.frame(
-        Alg = a,
-        OAvsK_tau = kendallOAvsK$tau,
-        OAvsK_p = kendallOAvsK$sl,
-        shapOA_p = shapOA$p.value,
-        shapK_p = shapK$p.value
-      )
-    )
 }
 rq3_1 <- rq3_1[order(-rq3_1$OverallAgreement),]
 write.table(rq3_1, file = "results/rq3_1.txt", sep = "\t", quote = FALSE, row.names = FALSE)
 
 #rq3_1a
-#rq3.1a: Kendall's test for each algorithm
-rq3_1a_Kendall_Alg$normalOA <- ifelse(rq3_1a_Kendall_Alg$shapOA_p < 0.05, "FALSE", "TRUE")
-rq3_1a_Kendall_Alg$normalK <- ifelse(rq3_1a_Kendall_Alg$shapK_p < 0.05, "FALSE", "TRUE")
-rq3_1a_Kendall_Alg$correlated <- ifelse(rq3_1a_Kendall_Alg$OAvsK_p < 0.05, "TRUE", "FALSE")
-write.table(rq3_1a_Kendall_Alg, file = "results/rq3_1a_Kendall_Alg.txt", sep = "\t", quote = FALSE, row.names = FALSE)
-
 #rq3_1a - Kruskal-Wallis for checking whether there exist sig. differences among algorithms
 kruskal.test(rq3_1$OverallAgreement, rq3_1$Alg) #p-value = 0.2 - not significantly different
 kruskal.test(rq3_1$kTestEst, rq3_1$Alg) #p-value = 0.009 - significantly different
@@ -382,8 +316,6 @@ write.table(rq3_1a_aggrSigBowker, file = "results/rq3_1a_aggrSigBowker.txt", sep
 
 
 #rq3.1b
-#Kendall for checking whether the two measures are consistent
-Kendall(rq3_1$OverallAgreement, rq3_1$kTestEst)#tau = 0.775, 2-sided pvalue < 2e-16
 #rq3_1b - comparison of each pair of QIs
 pdf(file = paste0("plots/rq3_1b_OA_QIs", suffix, ".pdf"), width = w, height = h)
 par(cex.lab=1.2, cex.axis=1.2)
@@ -439,9 +371,6 @@ for (ca in unique(data$pairAlgs)) {
   }
 }
 write.table(rq3_2, file = "results/rq3_2.txt", sep = "\t", quote = FALSE, row.names = FALSE)
-
-#Kendall for checking whether the two measures are consistent
-Kendall(rq3_2$OverallAgreement, rq3_2$kTestEst)#tau = 0.477, 2-sided pvalue < 2e-16
 
 #rq3_2 - comparison of each pair of QIs
 pdf(file = paste0("plots/rq3_2_OA_QIs", suffix, ".pdf"), width = w, height = h)
