@@ -12,40 +12,61 @@ import org.jgrapht.graph.DefaultEdge;
 public class Classification {
 	private static Map<QI, Set<Category>> category;
 
-	static {
+	private static void initClassification(boolean wangClassification) {
 		category = new HashMap<QI, Set<Category>>();
 		for (QI qi : QI.values()) {
 			category.put(qi, new HashSet<Category>());
 		}
+		if(wangClassification) {
+			// Classification taken from
+			// Shuai Wang, Shaukat Ali, Tao Yue, Yan Li, and Marius Liaaen.
+			// A practical guide to select quality indicators for assessing pareto-based
+			// search algorithms in search-based software engineering.
+			// In Proceedings of the 38th International Conference on Software Engineering
+			// (ICSE '16)
+			// A similar classification is given in:
+			//Miha Ravber, Marjan Mernik, Matej Crepinsek.
+			//The impact of Quality Indicators on the rating of Multi-objective Evolutionary Algorithms,
+			//In Applied Soft Computing, Volume 55, 2017, Pages 265-275
 
-		// Classification taken from
-		// Shuai Wang, Shaukat Ali, Tao Yue, Yan Li, and Marius Liaaen.
-		// A practical guide to select quality indicators for assessing pareto-based
-		// search algorithms in search-based software engineering.
-		// In Proceedings of the 38th International Conference on Software Engineering
-		// (ICSE '16)
-
-		// A similar classification is given in:
-		//Miha Ravber, Marjan Mernik, Matej Crepinsek.
-		//The impact of Quality Indicators on the rating of Multi-objective Evolutionary Algorithms,
-		//In Applied Soft Computing, Volume 55, 2017, Pages 265-275
-
-		category.get(QI.GD).add(Category.CONVERGENCE);
-		category.get(QI.ED).add(Category.CONVERGENCE);
-		category.get(QI.EP).add(Category.CONVERGENCE);
-		category.get(QI.GS).add(Category.DIVERSITY);
-		category.get(QI.PFS).add(Category.DIVERSITY);
-		category.get(QI.C).add(Category.COVERAGE);
-
-		// In the paper, IGD and HV are in the "Combination" category, that contains
-		// those QIs that combine convergence and diversity
-		category.get(QI.IGD).add(Category.CONVERGENCE);
-		category.get(QI.IGD).add(Category.DIVERSITY);
-		category.get(QI.HV).add(Category.CONVERGENCE);
-		category.get(QI.HV).add(Category.DIVERSITY);
+			category.get(QI.GD).add(Category.CONVERGENCE);
+			category.get(QI.ED).add(Category.CONVERGENCE);
+			category.get(QI.EP).add(Category.CONVERGENCE);
+			category.get(QI.GS).add(Category.DIVERSITY);
+			category.get(QI.PFS).add(Category.DIVERSITY);
+			category.get(QI.C).add(Category.COVERAGE);
+	
+			// In the paper, IGD and HV are in the "Combination" category, that contains
+			// those QIs that combine convergence and diversity
+			category.get(QI.IGD).add(Category.CONVERGENCE);
+			category.get(QI.IGD).add(Category.DIVERSITY);
+			category.get(QI.HV).add(Category.CONVERGENCE);
+			category.get(QI.HV).add(Category.DIVERSITY);
+		}
+		else {
+			category.get(QI.GD).add(Category.CONVERGENCE);
+			category.get(QI.ED).add(Category.CONVERGENCE);
+			category.get(QI.EP).add(Category.CONVERGENCE);
+			category.get(QI.EP).add(Category.SPREAD);
+			category.get(QI.EP).add(Category.UNIFORMITY);
+			category.get(QI.EP).add(Category.CARDINALITY);
+			category.get(QI.GS).add(Category.SPREAD);
+			category.get(QI.GS).add(Category.UNIFORMITY);
+			category.get(QI.PFS).add(Category.CARDINALITY);
+			category.get(QI.IGD).add(Category.CONVERGENCE);
+			category.get(QI.IGD).add(Category.SPREAD);
+			category.get(QI.IGD).add(Category.UNIFORMITY);
+			category.get(QI.IGD).add(Category.CARDINALITY);
+			category.get(QI.HV).add(Category.CONVERGENCE);
+			category.get(QI.HV).add(Category.SPREAD);
+			category.get(QI.HV).add(Category.UNIFORMITY);
+			category.get(QI.HV).add(Category.CARDINALITY);
+			category.get(QI.C).add(Category.CONVERGENCE);			
+		}
 	}
 
 	public static void main(String[] args) throws IOException {
+		initClassification(false);
 		agreeCatAll();
 		agreeCatAlgs();
 	}
