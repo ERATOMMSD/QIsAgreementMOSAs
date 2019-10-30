@@ -15,6 +15,13 @@ library("fmsb") # for Kappa.test
 options(scipen = 2)#for scientific notation
 options(digits = 3)
 
+for(p in c("results", "plots")) {
+  output_dir <- file.path(p)
+  if (!dir.exists(output_dir)){
+    dir.create(output_dir)
+  }
+}
+
 RECTANGULAR_PLOT = TRUE
 
 suffix = ""
