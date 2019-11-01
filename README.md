@@ -17,10 +17,10 @@ This repository contains:
   * *PairAlgorithms*: for a given pair of MOSAs
   
 ## Tool
-* In order to perform new statistical analyses on new data, a user can run the R script ![computeAgreementQIs.R](https://github.com/ERATOMMSD/QIsAgreementMOSAs/blob/master/statisticalTests/computeAgreementQIs.R). Input data must be added to this 
-![csv file](https://github.com/ERATOMMSD/QIsAgreementMOSAs/blob/master/statisticalTests/inputData/inputData.csv) using
+* In order to perform new statistical analyses on new data, a user can run the R script [computeAgreementQIs.R](https://github.com/ERATOMMSD/QIsAgreementMOSAs/blob/master/statisticalTests/computeAgreementQIs.R). Input data must be added to this 
+[csv file](https://github.com/ERATOMMSD/QIsAgreementMOSAs/blob/master/statisticalTests/inputData/inputData.csv) using
 
-The observations can be generated using the tool GenObs provided as jar file: ![GenObs.jar](https://github.com/ERATOMMSD/QIsAgreementMOSAs/tree/master/code/generatorReprSets/GenObs.jar)
+The observations can be generated using the tool GenObs provided as jar file: [GenObs.jar](https://github.com/ERATOMMSD/QIsAgreementMOSAs/tree/master/code/generatorReprSets/GenObs.jar)
 
 ## People
 * Shaukat Ali https://www.simula.no/people/shaukat
