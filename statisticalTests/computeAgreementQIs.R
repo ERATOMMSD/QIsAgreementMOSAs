@@ -33,6 +33,10 @@ if(RECTANGULAR_PLOT) {
   suffix = "_rect"
 }
 
+
+
+######### Load data #########
+
 data <- read.table(file = "inputData/inputData.csv", head = TRUE, sep = ";")
 QIs <- c("HV", "IGD", "EP", "GD", "GS", "ED", "PFS", "C")
 ALGs <- c("CELLDE", "MOCELL", "NSGAII", "PAES", "SMPSO", "SPEA2")
@@ -54,7 +58,49 @@ data$pairAlgs <- as.factor(paste(data$A, data$B, sep = "_"))
 
 #same data contained in the input file inputData.csv, but in a different format
 #inputDataDiffStructure.txt is computed from inputData.csv using script inputData/buildDifferentDataStructure.R
+
+#Problems <- c("RA", "TS", "TRA", "RP", "TM", "TP1", "TP2", "TP3", "TP4", "RM", "ITO")
+Problems <- as.vector(unique(data$CaseStudy))
+data$pairAlgs <- as.factor(paste(data$A, data$B, sep = "_"))
+
+dataDiffStructure <- data.frame()
+for (p in Problems) {
+  dataP <- subset(data, data$CaseStudy == p)
+  for (ca in unique(data$pairAlgs)) {
+    dataPca <- subset(dataP, dataP$pairAlgs == ca)
+    if (NROW(dataPca) > 0) {
+      stopifnot(NROW(dataPca) == 1)
+      for (i in 1:(length(QIs) - 1)) {
+        for (j in (i + 1):length(QIs)) {
+          row <- data.frame(
+            qi1vsqi2 = paste(QIs[i], QIs[j], sep = "vs"),
+            qi1 = QIs[i],
+            qi2 = QIs[j],
+            Problem = p,
+            pairAlgs = ca,
+            AlgA = dataPca[, c("A")],
+            AlgB = dataPca[, c("B")],
+            resQI1 = as.character(dataPca[, QIs[i]]),
+            resQI2 = as.character(dataPca[, QIs[j]]),
+            Agree = as.character(dataPca[, QIs[i]]) == as.character(dataPca[, QIs[j]])
+          )
+          dataDiffStructure <- rbind(dataDiffStructure, row)
+          
+        }
+      }
+    }
+  }
+}
+write.table(
+  dataDiffStructure,
+  file = "inputData/inputDataDiffStructure.txt",
+  sep = "\t",
+  quote = FALSE,
+  row.names = FALSE
+)
 dataDiffStructure <- read.table(file = "inputData/inputDataDiffStructure.txt", head = TRUE, sep = "\t")
+
+######### end load data #########
 
 
 #####################################

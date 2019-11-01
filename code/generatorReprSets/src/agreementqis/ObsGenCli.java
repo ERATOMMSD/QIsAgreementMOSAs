@@ -17,30 +17,81 @@ import java.util.stream.Collectors;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-public class RepSetsGenerator {
+public class ObsGenCli {
 
 	public static void main(String[] args) throws IOException {
-		computeQImaxAgreement();// for SR
-		computeMinimalSetAllQIs();// for MRS
+		String errorMessage = "The tool must me invoked as follows:\njava -jar GenObs.jar TypeOfMOSA TypeOfObservation\n- TypeOfMOSA: all, single, or pairs\n- TypeOfObservation: SR, or MRS";
+		if(args.length < 2) {
+			System.out.println(errorMessage);
+			return;
+		}
+		String typeMOSA = args[0];//"all", "single", or "pairs"
+		String typeObservation = args[1];//"SR", or "MRS"
+		if(!typeMOSA.equals("all") && !typeMOSA.equals("single") && !typeMOSA.equals("pairs")) {
+			System.out.println(errorMessage);
+			return;
+		}
+		if(!typeObservation.equals("SR") && !typeObservation.equals("MRS")) {
+			System.out.println(errorMessage);
+			return;
+		}
+		switch (typeObservation) {
+			case "SR":
+				analyzeSR(typeMOSA);
+				break;
+			case "MRS":
+				analyzeMSR(typeMOSA);
+				break;
+			default:
+				break;
+		}
 	}
 
-	/**
-	 * This is for SR
-	 * 
-	 * @throws IOException
-	 */
-	private static void computeQImaxAgreement() throws IOException {
-		computeQImaxAgreement("../../statisticalTests/results/rq1.txt", null, null);
-		for (MOSA alg1 : MOSA.values()) {
-			computeQImaxAgreement("../../statisticalTests/results/rq3_1.txt", alg1, null);
-		}
-		MOSA[] mosas = MOSA.values();
-		for (int i = 0; i < mosas.length; i++) {
-			MOSA alg1 = mosas[i];
-			for (int j = i + 1; j < mosas.length; j++) {
-				MOSA alg2 = mosas[j];
-				computeQImaxAgreement("../../statisticalTests/results/rq3_2.txt", alg1, alg2);
+	private static void analyzeSR(String typeMOSA) throws IOException {
+		switch (typeMOSA) {
+		case "all":
+			computeQImaxAgreement("../../statisticalTests/results/rq1.txt", null, null);
+			break;
+		case "single":
+			for (MOSA alg1 : MOSA.values()) {
+				computeQImaxAgreement("../../statisticalTests/results/rq3_1.txt", alg1, null);
 			}
+			break;
+		case "pairs":
+			MOSA[] mosas = MOSA.values();
+			for (int i = 0; i < mosas.length; i++) {
+				MOSA alg1 = mosas[i];
+				for (int j = i + 1; j < mosas.length; j++) {
+					MOSA alg2 = mosas[j];
+					computeQImaxAgreement("../../statisticalTests/results/rq3_2.txt", alg1, alg2);
+				}
+			}
+		default:
+			break;
+		}
+	}
+
+	private static void analyzeMSR(String typeMOSA) throws IOException {
+		switch (typeMOSA) {
+		case "all":
+			print(computeMinimalSetAllQIs("../../statisticalTests/results/rq1.txt", null, null), null, null);
+			break;
+		case "single":
+			for (MOSA alg1 : MOSA.values()) {
+				print(computeMinimalSetAllQIs("../../statisticalTests/results/rq3_1.txt", alg1, null), alg1, null);
+			}
+			break;
+		case "pairs":
+			MOSA[] mosas = MOSA.values();
+			for (int i = 0; i < mosas.length; i++) {
+				MOSA alg1 = mosas[i];
+				for (int j = i + 1; j < mosas.length; j++) {
+					MOSA alg2 = mosas[j];
+					print(computeMinimalSetAllQIs("../../statisticalTests/results/rq3_2.txt", alg1, alg2), alg1, alg2);
+				}
+			}
+		default:
+			break;
 		}
 	}
 
@@ -50,10 +101,9 @@ public class RepSetsGenerator {
 	 * @throws IOException
 	 */
 	private static void computeQImaxAgreement(String path, MOSA alg1, MOSA alg2) throws IOException {
-		System.out.println("SR - " + (alg1 == null ? "ALL" : (alg2 == null ? alg1 : alg1 + "-" + alg2))
-				+ " - QI -> [QI1,...,QIk], AVG Kappa among QI and QI1,...,QIk (average strength of the agreement), strength of the agreement");
-		DefaultDirectedGraph<QI, DefaultEdge> graph = RepSetsGenerator.buildGraphFromFile(path, alg1, alg2);
-		Map<String, String> kappa = RepSetsGenerator.getKappa(path, alg1, alg2);
+		System.out.print("Single representative QI " + (alg1 == null ? "(without caring about any particular MOSA)" : (alg2 == null ? ("(caring about " + alg1 + ")") : ("(caring about the pair " + alg1 + "-" + alg2 + ")"))) + ": ");
+		DefaultDirectedGraph<QI, DefaultEdge> graph = ObsGenCli.buildGraphFromFile(path, alg1, alg2);
+		Map<String, String> kappa = ObsGenCli.getKappa(path, alg1, alg2);
 
 		Map<QI, Set<QI>> covers = new HashMap<>();
 		Map<QI, Double> avgStrengthAgreement = new HashMap<>();
@@ -71,7 +121,7 @@ public class RepSetsGenerator {
 			avgStrengthAgreement.put(v, (numPairs > 0 ? k / numPairs : 0));
 			strengthAgreement.put(v, covered.size() + (k / (numPairs + 1)));
 		}
-		covers.entrySet().stream().sorted(new Comparator<Map.Entry<QI, Set<QI>>>() {
+		List<Entry<QI, Set<QI>>> k = covers.entrySet().stream().sorted(new Comparator<Map.Entry<QI, Set<QI>>>() {
 			@Override
 			public int compare(Map.Entry<QI, Set<QI>> o1, Map.Entry<QI, Set<QI>> o2) {
 				int diffSize = o2.getValue().size() - o1.getValue().size();
@@ -83,8 +133,23 @@ public class RepSetsGenerator {
 					return (diffAvgStrengthAgreement > 0 ? 1 : (diffAvgStrengthAgreement < 0 ? -1 : 0));
 				}
 			}
-		}).forEach(k -> System.out.println(k.getKey() + "->" + k.getValue() + ", "
-				+ avgStrengthAgreement.get(k.getKey()) + ", " + strengthAgreement.get(k.getKey())));
+		}).collect(Collectors.toList());
+		Double asa = null;
+		Double sa = null;
+		for(Entry<QI, Set<QI>> entry: k) {
+			QI key = entry.getKey();
+			if(asa == null) {
+				System.out.print(key);
+			}
+			else if (asa.equals(avgStrengthAgreement.get(key)) && sa.equals(strengthAgreement.get(key))) {
+				System.out.print(" / " + key);
+			}
+			else {
+				break;
+			}
+			asa = avgStrengthAgreement.get(key);
+			sa = strengthAgreement.get(key);
+		}
 		System.out.println();
 	}
 
@@ -94,18 +159,7 @@ public class RepSetsGenerator {
 	 * @throws IOException
 	 */
 	private static void computeMinimalSetAllQIs() throws IOException {
-		print(computeMinimalSetAllQIs("../../statisticalTests/results/rq1.txt", null, null), null, null);
-		for (MOSA alg1 : MOSA.values()) {
-			print(computeMinimalSetAllQIs("../../statisticalTests/results/rq3_1.txt", alg1, null), alg1, null);
-		}
-		MOSA[] mosas = MOSA.values();
-		for (int i = 0; i < mosas.length; i++) {
-			MOSA alg1 = mosas[i];
-			for (int j = i + 1; j < mosas.length; j++) {
-				MOSA alg2 = mosas[j];
-				print(computeMinimalSetAllQIs("../../statisticalTests/results/rq3_2.txt", alg1, alg2), alg1, alg2);
-			}
-		}
+		
 	}
 
 	/**
@@ -116,8 +170,8 @@ public class RepSetsGenerator {
 	 * @throws IOException
 	 */
 	static Map<String, Double> computeMinimalSetAllQIs(String path, MOSA alg1, MOSA alg2) throws IOException {
-		DefaultDirectedGraph<QI, DefaultEdge> graph = RepSetsGenerator.buildGraphFromFile(path, alg1, alg2);
-		Map<String, String> kappa = RepSetsGenerator.getKappa(path, alg1, alg2);
+		DefaultDirectedGraph<QI, DefaultEdge> graph = ObsGenCli.buildGraphFromFile(path, alg1, alg2);
+		Map<String, String> kappa = ObsGenCli.getKappa(path, alg1, alg2);
 		Map<QI, Set<QI>> covers = new HashMap<>();
 		for (QI v : graph.vertexSet()) {
 			Set<QI> covered = graph.outgoingEdgesOf(v).stream().map(x -> graph.getEdgeTarget(x))
@@ -265,15 +319,28 @@ public class RepSetsGenerator {
 	}
 
 	private static void print(Map<String, Double> computeMinimalSetAllQIs, MOSA alg1, MOSA alg2) {
-		System.out.println("MRS - " + (alg1 == null ? "ALL" : (alg2 == null ? alg1 : alg1 + "-" + alg2))
-				+ " - [QI1, ...,QIk], AVG Kappa among the couples of QIs");
-		computeMinimalSetAllQIs.entrySet().stream().sorted(new Comparator<Entry<String, Double>>() {
+		System.out.print("Minimum Representative Set " + (alg1 == null ? "(without caring about any particular MOSA)" : (alg2 == null ? ("(caring about " + alg1 + ")") : ("(caring about the pair " + alg1 + "-" + alg2 + ")"))) + ": ");
+		List<Entry<String, Double>> k = computeMinimalSetAllQIs.entrySet().stream().sorted(new Comparator<Entry<String, Double>>() {
 			@Override
 			public int compare(Entry<String, Double> o1, Entry<String, Double> o2) {
 				double diff = o2.getValue() - o1.getValue();
 				return (diff > 0 ? -1 : (diff < 0 ? 1 : 0));
 			}
-		}).forEach(k -> System.out.println(k.getKey() + ", " + k.getValue()));
+		}).collect(Collectors.toList());
+		Double value = null;
+		for(Entry<String, Double> entry: k) {
+			String key = entry.getKey();
+			if(value == null) {
+				System.out.print(key.replaceAll("\\[", "{").replaceAll("\\]", "}"));
+			}
+			else if (value.equals(entry.getValue())) {
+				System.out.print(" / " + key.replaceAll("\\[", "{").replaceAll("\\]", "}"));
+			}
+			else {
+				break;
+			}
+			value = entry.getValue();
+		}
 		System.out.println();
 	}
 
