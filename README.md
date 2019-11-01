@@ -23,7 +23,7 @@ This repository contains:
    CaseStudy;A;B;HV;IGD;EP;GD;GS;ED;PFS;C
    CaseStudyName;MOSA1;MOSA2;B;B;B;A;A;A;A;ND
    ```
-   where the first line is the header of the file, and the second line is an example of entry; *CaseStudyName* is the name of the search problem, *MOSA1* and *MOSA2* the names of the two compared MOSAs (*A* and *B* in the header), and the remaining columns tell whether a given quality indicator (reported in the table header) prefers *A* (i.e., *MOSA1*), *B* (i.e., *MOSA2*), or there is no difference (*ND*) for the criterion. 
+   where the first line is the header of the file, and the second line is an example of entry; *CaseStudyName* is the name of the search problem, *MOSA1* and *MOSA2* the names of the two compared MOSAs (*A* and *B* in the header), and the remaining columns tell whether a given quality indicator (reported in the table header) prefers *A* (i.e., *MOSA1*), *B* (i.e., *MOSA2*), or there is no difference (*ND*) for the indicator. 
 
 * The observations can be generated using the tool GenObs provided as jar file: [GenObs.jar](https://github.com/ERATOMMSD/QIsAgreementMOSAs/blob/master/code/generatorReprSets/GenObs.jar?raw=true)
   * The tool must me invoked as follows:
