@@ -1,4 +1,4 @@
-# Insights on Quality Indicators in Search-Based Software Engineering: An Empirical Evaluation
+# Quality Indicators in Search-Based Software Engineering: An Empirical Evaluation
 
 ## Description
 Search-Based Software Engineering (SBSE) researchers who apply multi-objective search algorithms (MOSAs) assess the quality of solutions produced by MOSAs with quality indicators (QIs). Given the fact that SBSE researchers typically apply MOSAs from the evolutionary computation domain to address software engineering problems, they have limited knowledge about QIs and their relations with SBSE problems and MOSAs. To this end, we conducted an extensive empirical evaluation to provide insights on commonly used QIs in SBSE by studying agreements among them when comparing MOSAs, with and without considering differences of SBSE problems and MOSAs. In addition, by defining a systematic process based on three common ways of comparing MOSAs, we produced additional observations based on the results of our empirical evaluation. These observations can be used by SBSE researchers to gain a better understanding of the commonly used QIs in SBSE and their agreements.
@@ -48,3 +48,6 @@ Note that, at the current stage, we do not provide the computation of all the qu
 * Dipesh Pradhan https://www.simula.no/people/dipeshpr
 * Safdar Aqeel Safdar https://www.simula.no/people/safdar
 * Tao Yue https://www.simula.no/people/tao
+
+## Paper
+S. Ali, P. Arcaini, D. Pradhan, S.A. Safdar, and T. Yue. Quality Indicators in Search-Based Software Engineering: An Empirical Evaluation. In ACM Transactions on Software Engineering and Methodology, 2020. Preprint available [here](https://www.simula.no/publications/quality-indicators-search-based-software-engineering-empirical-evaluation)
