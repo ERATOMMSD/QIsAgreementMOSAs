@@ -50,4 +50,4 @@ Note that, at the current stage, we do not provide the computation of all the qu
 * Tao Yue https://www.simula.no/people/tao
 
 ## Paper
-S. Ali, P. Arcaini, D. Pradhan, S.A. Safdar, and T. Yue. Quality Indicators in Search-Based Software Engineering: An Empirical Evaluation. In ACM Transactions on Software Engineering and Methodology, 2020. Preprint available [here](https://www.simula.no/publications/quality-indicators-search-based-software-engineering-empirical-evaluation)
+S. Ali, P. Arcaini, D. Pradhan, S.A. Safdar, and T. Yue. Quality Indicators in Search-Based Software Engineering: An Empirical Evaluation. In ACM Transactions on Software Engineering and Methodology, 29, 2, Article 10 (March 2020). [[doi](https://doi.org/10.1145/3375636)]
