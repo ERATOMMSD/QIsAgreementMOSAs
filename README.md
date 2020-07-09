@@ -35,7 +35,6 @@ This repository contains:
 
 ## How to contribute to the project
 Our observations are based on 11 search problems, taken from different domains.
-Should the paper be accepted, we will make them publicly available (in any case, they can be already produced with the tool).
 
 We will also actively update the observations when more data are available and analyzed.
 In order to enlarge the evaluation, we encourage researchers to send us data from their experiments, so that we can add it to our repository and so obtain a more comprehensive evaluation. In order to do this, you should send us a link to a csv file having the structure described in the Tool section at the address arcaini@nii.ac.jp
